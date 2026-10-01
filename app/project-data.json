@@ -1,0 +1,36 @@
+{
+  "projects": [
+    {
+      "name": "Community Onboarding",
+      "owner": "Maya Chen",
+      "status": "Active",
+      "recentActivity": "Published the first-contribution checklist and gathered feedback from three new contributors.",
+      "priority": "High",
+      "summary": "Make the path from first visit to first merged contribution clear. Help is welcome reviewing the setup guide and testing it on a fresh environment."
+    },
+    {
+      "name": "Accessibility Audit",
+      "owner": "Jordan Rivera",
+      "status": "At risk",
+      "recentActivity": "Keyboard testing found two focus-order issues in the settings flow; fixes are being scoped.",
+      "priority": "Critical",
+      "summary": "Improve keyboard and screen-reader support across the main workflows. Contributors can reproduce the reported issues and verify proposed fixes."
+    },
+    {
+      "name": "Metrics Explorer",
+      "owner": "Avery Patel",
+      "status": "In progress",
+      "recentActivity": "Added date-range filtering to the prototype and shared it for product review.",
+      "priority": "Medium",
+      "summary": "Give teams a faster way to explore service health trends. The next useful contribution is feedback on filter behavior and empty results."
+    },
+    {
+      "name": "Documentation Refresh",
+      "owner": "Sam Okafor",
+      "status": "On hold",
+      "recentActivity": "Collected outdated setup instructions and grouped them by component.",
+      "priority": "Low",
+      "summary": "Bring setup and maintenance docs up to date. Small, independent edits are a good fit once the release work is complete."
+    }
+  ]
+}

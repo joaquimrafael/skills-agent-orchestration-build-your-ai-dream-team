@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A clear, contributor-friendly snapshot of project progress and priorities.">
+    <title>Project Pulse</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="dashboard">
+      <header class="dashboard-header">
+        <div>
+          <h1>Project Pulse</h1>
+          <p class="dashboard-intro">A quick view of what teams are building, what moved recently, and where contributors can help.</p>
+        </div>
+        <p class="dashboard-summary" id="dashboard-summary">Loading projects…</p>
+      </header>
+
+      <section aria-labelledby="projects-heading">
+        <h2 id="projects-heading">Projects</h2>
+        <div id="dashboard-state" class="empty-state" role="status" aria-live="polite">
+          <p>Loading project data…</p>
+        </div>
+        <div id="project-grid" class="project-grid" role="list" aria-label="Projects"></div>
+      </section>
+    </main>
+
+    <script>
+      "use strict";
+
+      const requiredProjectFields = ["name", "owner", "status", "recentActivity", "priority"];
+      const dashboardState = document.querySelector("#dashboard-state");
+      const projectGrid = document.querySelector("#project-grid");
+      const dashboardSummary = document.querySelector("#dashboard-summary");
+
+      function showState(message, stateClass, role) {
+        dashboardState.replaceChildren();
+        dashboardState.className = stateClass;
+        dashboardState.setAttribute("role", role);
+        dashboardState.setAttribute("aria-live", role === "alert" ? "assertive" : "polite");
+
+        const [summary, ...details] = message.split("\n");
+        const messageElement = document.createElement("p");
+        messageElement.textContent = summary;
+        dashboardState.append(messageElement);
+        if (details.length > 0) {
+          const detailList = document.createElement("ul");
+          details.forEach((detail) => {
+            const item = document.createElement("li");
+            item.textContent = detail;
+            detailList.append(item);
+          });
+          dashboardState.append(detailList);
+        }
+        dashboardState.hidden = false;
+        projectGrid.replaceChildren();
+      }
+
+      function normalizeToken(value) {
+        return value
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, "");
+      }
+
+      function validateProjectData(data) {
+        if (data === null || typeof data !== "object" || Array.isArray(data)) {
+          throw new Error("The data file must contain a JSON object with a projects array.");
+        }
+
+        if (!Array.isArray(data.projects)) {
+          throw new Error('The data file is missing a valid top-level "projects" array.');
+        }
+
+        const issues = [];
+        data.projects.forEach((project, index) => {
+          const projectLabel = `Project ${index + 1}`;
+
+          if (project === null || typeof project !== "object" || Array.isArray(project)) {
+            issues.push(`${projectLabel} must be an object.`);
+            return;
+          }
+
+          requiredProjectFields.forEach((field) => {
+            if (typeof project[field] !== "string" || project[field].trim() === "") {
+              issues.push(`${projectLabel} is missing a non-empty "${field}" field.`);
+            }
+          });
+
+          if (Object.hasOwn(project, "summary") && typeof project.summary !== "string") {
+            issues.push(`${projectLabel} has an invalid "summary" field; it must be a string.`);
+          }
+        });
+
+        if (issues.length > 0) {
+          throw new Error(`Project data has invalid entries:\n${issues.join("\n")}`);
+        }
+
+        return data.projects;
+      }
+
+      function createDetail(label, value) {
+        const container = document.createElement("div");
+        container.className = "project-card__detail";
+
+        const term = document.createElement("dt");
+        term.textContent = label;
+        const description = document.createElement("dd");
+        description.textContent = value.trim();
+
+        container.append(term, description);
+        return container;
+      }
+
+      function createProjectCard(project) {
+        const card = document.createElement("article");
+        card.className = "project-card";
+        card.setAttribute("role", "listitem");
+
+        const header = document.createElement("header");
+        header.className = "project-card__header";
+
+        const heading = document.createElement("h3");
+        heading.textContent = project.name.trim();
+        const owner = document.createElement("p");
+        owner.className = "project-card__owner";
+        owner.textContent = `Owned by ${project.owner.trim()}`;
+        header.append(heading, owner);
+
+        card.append(header);
+
+        if (typeof project.summary === "string" && project.summary.trim() !== "") {
+          const summary = document.createElement("p");
+          summary.className = "project-card__summary";
+          summary.textContent = project.summary.trim();
+          card.append(summary);
+        }
+
+        const details = document.createElement("dl");
+        details.className = "project-card__details";
+        details.append(createDetail("Recent activity", project.recentActivity));
+        card.append(details);
+
+        const footer = document.createElement("footer");
+        footer.className = "project-card__footer";
+
+        const status = document.createElement("span");
+        status.className = `status status--${normalizeToken(project.status)}`;
+        status.dataset.status = normalizeToken(project.status);
+        status.textContent = `Status: ${project.status.trim()}`;
+
+        const priority = document.createElement("span");
+        priority.className = `priority priority--${normalizeToken(project.priority)}`;
+        priority.dataset.priority = normalizeToken(project.priority);
+        priority.textContent = `Priority: ${project.priority.trim()}`;
+
+        footer.append(status, priority);
+        card.append(footer);
+        return card;
+      }
+
+      async function loadProjects() {
+        try {
+          const response = await fetch("project-data.json");
+          if (!response.ok) {
+            throw new Error(`The server returned HTTP ${response.status}.`);
+          }
+
+          const responseText = await response.text();
+          let data;
+          try {
+            data = JSON.parse(responseText);
+          } catch {
+            throw new Error("The project data file contains malformed JSON.");
+          }
+
+          const projects = validateProjectData(data);
+          if (projects.length === 0) {
+            dashboardSummary.textContent = "No projects yet";
+            showState("There are no projects to display yet.", "empty-state", "status");
+            return;
+          }
+
+          projectGrid.replaceChildren(...projects.map(createProjectCard));
+          projectGrid.setAttribute("aria-label", `${projects.length} projects`);
+          dashboardSummary.textContent = `${projects.length} ${projects.length === 1 ? "project" : "projects"}`;
+          dashboardState.hidden = true;
+        } catch (error) {
+          dashboardSummary.textContent = "Projects unavailable";
+          const message = error instanceof Error ? error.message : "An unexpected error occurred.";
+          showState(`Unable to display projects. ${message}`, "error-state", "alert");
+        }
+      }
+
+      loadProjects();
+    </script>
+  </body>
+</html>
