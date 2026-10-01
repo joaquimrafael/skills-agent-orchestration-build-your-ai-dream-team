@@ -1,7 +1,6 @@
 ---
 name: Designer
 description: Handles UI/UX, accessibility, information architecture, interaction flow, and visual design.
-model: Gemini 3.1 Pro (copilot)
 tools: ['read', 'edit', 'search', 'web', 'memory', 'todo']
 ---
 

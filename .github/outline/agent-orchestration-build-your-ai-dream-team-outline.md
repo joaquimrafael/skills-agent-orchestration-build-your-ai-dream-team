@@ -20,11 +20,9 @@ By the end of this exercise, learners will be able to:
 
 1. Explain the responsibility of an Orchestrator agent in a multi-agent workflow.
 1. Inspect prebuilt custom agent definitions in `.github/agents/`.
-1. Identify model assignments for the exercise agents:
-   - Orchestrator: Opus 4.7
-   - Planner: Opus 4.7
-   - Coder: GPT-5.5
-   - Designer: Gemini 3.1 Pro
+1. Explain model selection for the exercise agents:
+   - Each agent inherits Copilot's default model because no model is pinned in its definition.
+   - Copilot Free uses Auto model selection only.
 1. Use GitHub Copilot CLI in a Codespace terminal as the primary interface.
 1. Ask the Orchestrator to involve the Planner before implementation.
 1. Separate design work from coding work.
@@ -97,7 +95,7 @@ GitHub Copilot CLI can use custom agents stored in `.github/agents/`. In this ex
 
 - `docs/agent-team.md` exists.
 - The file includes `Orchestrator`, `Planner`, `Coder`, and `Designer`.
-- The file includes `Opus 4.7`, `GPT-5.5`, and `Gemini 3.1 Pro`.
+- The file explains that agents inherit Copilot's default model and Copilot Free uses Auto model selection.
 - The file references `.github/agents/` and Project Pulse.
 
 ## Step 2: Plan Project Pulse

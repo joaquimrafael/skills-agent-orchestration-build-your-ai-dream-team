@@ -58,7 +58,7 @@ The custom agent definitions are already available in `.github/agents/`. Your fi
 1. Update `docs/agent-team.md` with:
 
    - Orchestrator, Planner, Coder, and Designer.
-   - The model assigned to each agent.
+   - The model selection behavior: agents inherit Copilot's default model, and Copilot Free uses Auto model selection.
    - The responsibility of each agent.
    - The `.github/agents/` file for each agent.
    - How the team will work together to build Project Pulse.
@@ -85,7 +85,7 @@ The custom agent definitions are already available in `.github/agents/`. Your fi
 - Make sure you updated `docs/agent-team.md`.
 - Make sure the file references `.github/agents/`.
 - Make sure the file includes all four agent names.
-- Make sure the file uses the updated models: Opus 4.7, GPT-5.5, and Gemini 3.1 Pro.
+- Make sure the file explains that the agents inherit Copilot's default model and Copilot Free uses Auto model selection.
 - Make sure you pushed your commit.
 
 </details>
